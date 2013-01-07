@@ -16,3 +16,6 @@ Configuration file: TF2DropMonitor.ini
 
 'poll_minutes': The number of minutes to wait before each inventory check.
     Recommended: 3
+
+'logging': Whether to log your drops to a file or not.
+    '1' to enable, '0' to disable.

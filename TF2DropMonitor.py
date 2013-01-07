@@ -95,10 +95,12 @@ class DropThread(threading.Thread):
             return newestItems
             
     def dropEvent(self, item):
-        print '%s  | %s | %s | %s' %(item.time,
+        msg = '%s  | %s | %s | %s' %(item.time,
                                 string.ljust(item.account, 12),
                                 string.ljust(item.material, 6),
                                 item.name)
+        print msg
+        log.log(msg)
 
 class Item:
     def __init__(self):
@@ -114,6 +116,7 @@ class Options:
         self.accounts = []
         self.apiKey = ''
         self.pollMinutes = 1
+        self.logging = 0
         self.get_config_options()
 
     def get_config_options(self):
@@ -122,14 +125,30 @@ class Options:
             self.accounts = self.conf.get('General', 'accounts').split(',')
             self.apiKey = self.conf.get('General', 'api_key')
             self.pollMinutes = int(self.conf.get('General', 'poll_minutes'))
+            self.logging = int(self.conf.get('General', 'logging'))
         except Exception as e:
             print 'Options Error:', e
             return
+
+class Log:
+    def __init__(self):
+        self.logfile = os.path.join(os.getcwd(), 'TF2DropMonitor.log')
+        self.enabled = 0
+
+    def log(self, msg):
+        if self.enabled:
+            with open(self.logfile, 'a') as f:
+                f.write(msg + '\r\n')
+
 
 if __name__ == '__main__':
     options = Options()
     
     steam.base.set_api_key(options.apiKey)
+    global log
+    log = Log()
+    if options.logging == 1:
+        log.enabled = 1
     
     for acc in options.accounts:
         t = DropThread(acc)
