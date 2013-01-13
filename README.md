@@ -1,8 +1,3 @@
----
-title: TF2 Drop Monitor
-categories: projects, python
-date: 2013/1/13 14:22:01
----
 About
 ===
 In TF2 items are dropped for players every hour or so, with a weekly limit on the number of items that can drop. This has led to people creating idling accounts to collect their drops for the week. TF2 Drop Monitor is a python script that monitors your TF2 accounts for new drops. It does so via polling using the Steam web API. It makes checking your loot an easy process, since everything is nicely laid out. You don't have to check each account's backpack individually.
