@@ -23,14 +23,14 @@ Next edit `TF2DropMonitor.ini`.
 * `poll_minutes` defines the frequency of checks done in minutes.
 * `logging` defines whether to log your drops or not. `1` to enable logging.
 * `html_dir` is the directory to which the html output will be generated. This can be a relative or absolute path. Remember that `style.css` and the base `index.html` provided in the output folder has to be in the directory you choose.
-~~~
-[General]
-accounts=account1,account2,account3
-api_key=YOUR_API_KEY
-poll_minutes=3
-logging=0
-html_dir=output
-~~~
+` `
+
+    [General]
+    accounts=account1,account2,account3
+    api_key=YOUR_API_KEY
+    poll_minutes=3
+    logging=0
+    html_dir=output
 
 Once all this is configured, you simply have to run the `TF2DropMonitor.py`
 
