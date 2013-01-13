@@ -1,30 +1,93 @@
-[INFORMATION]
-TF2DropMonitor monitors the inventories of specified accounts for new items. The new items are then written to a html file for easy viewing. The primary purpose of TF2DropMonitor is to allow you to easily view what your idle accounts have found.
+About
 
-It is written in python and the source code is available for you to freely edit, adapt and redistribute. The python library 'steamodd' is used to interact with Steam.
+In TF2 items are dropped for players every hour or so, with a weekly limit on the number of items that can drop. This has led to people creating idling accounts to collect their drops for the week. TF2 Drop Monitor is a python script that monitors your TF2 accounts for new drops. It does so via polling using the Steam web API. It makes checking your loot an easy process, since everything is nicely laid out. You don't have to check each account's backpack individually.
+Installation
 
+TF2DropMonitor is available on GitHub. First you need to clone a copy to your local machine.
+> git clone https://github.com/wryyl/TF2DropMonitor
+Configuration
 
-------------------------------------------------------------------
-[CONFIGURATION]
-Configuration file: TF2DropMonitor.ini
+Next edit TF2DropMonitor.ini. 
+accounts is a comma-separated list of your accounts you wish to monitor.
+api_key is your Steam API key. You can get your key here.
+poll_minutes defines the frequency of checks done in minutes.
+logging defines whether to log your drops or not. 1 to enable logging.
+html_dir is the directory to which the html output will be generated. This can be a relative or absolute path. Remember that style.css and the base index.html provided in the output folder has to be in the directory you choose.
+[General]
+accounts=account1,account2,account3
+api_key=YOUR_API_KEY
+poll_minutes=3
+logging=0
+html_dir=output
 
-accounts: A list of steamIDs to monitor, separated by commas. The steamIDs must correspond to the custom URL of the account. For instance, if my profile is 'http://steamcommunity.com/id/wryyl', then my steamID is 'wryyl'. The custom URL can be set by editing your steam profile.
-    Example: account1,account2,account3
+Once all this is configured, you simply have to run the TF2DropMonitor.py
+chmod u+x TF2DropMonitor.py
+./TF2DropMonitor.py
 
-api_key: Your API key. You can get your key at 'http://steamcommunity.com/dev/apikey'. Just enter 'google.com' or something as your domain name. This is needed to retrieve backpack information.
-    Example: B8BF6FDG536JLK2AB1BD8184E88MB2C9
+Something I also did was make an init script. Here's mine:
+#!/bin/bash
+# tf2drops daemon
+# chkconfig: 345 82 22
+# description: Monitors TF2 idle accounts for new drops.
+# processname: tf2drops
 
-poll_minutes: The number of minutes to wait before each inventory check.
-    Recommended: 3
+DAEMON_PATH="/scripts/TF2DropMonitor"
 
-logging: Whether to log your drops to a file or not.
-    '1' to enable, '0' to disable.
+DAEMON="/scripts/TF2DropMonitor/TF2DropMonitor.py"
 
-html_dir: Path to where you want to generate the html in. The html will be generated in index.html in this directory.
+NAME=tf2drops
+DESC="Monitors TF2 idle accounts for new drops."
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
 
+case "$1" in
+start)
+    printf "%-50s" "Starting $NAME..."
+    cd $DAEMON_PATH
+    PID=`$DAEMON > /dev/null 2>&1 & echo $!`
+    #echo "Saving PID" $PID " to " $PIDFILE
+        if [ -z $PID ]; then
+            printf "%s\n" "Fail"
+        else
+            echo $PID > $PIDFILE
+            printf "%s\n" "Ok"
+        fi
+;;
+status)
+        printf "%-50s" "Checking $NAME..."
+        if [ -f $PIDFILE ]; then
+            PID=`cat $PIDFILE`
+            if [ -z "`ps axf | grep ${PID} | grep -v grep`" ]; then
+                printf "%s\n" "Process dead but pidfile exists"
+            else
+                echo "Running"
+            fi
+        else
+            printf "%s\n" "Service not running"
+        fi
+;;
+stop)
+        printf "%-50s" "Stopping $NAME"
+            PID=`cat $PIDFILE`
+            cd $DAEMON_PATH
+        if [ -f $PIDFILE ]; then
+            kill -HUP $PID
+            printf "%s\n" "Ok"
+            rm -f $PIDFILE
+        else
+            printf "%s\n" "pidfile not found"
+        fi
+;;
 
-------------------------------------------------------------------
-[NOTES]
-In the directory specified by the html_dir variable, ensure that you have the base index.html and style.css inside.
+restart)
+    $0 stop
+    $0 start
+;;
 
-You can set the script to write index.html to your webserver, thereby allowing you to view your item drops online.
+*)
+        echo "Usage: $0 {status|start|stop|restart}"
+        exit 1
+esac
+
+Edit the path variables at the top then save it to /etc/init.d/tf2drops. Now all you have to do is run service tf2drops start or /etc/init.d/tf2drops start to run TF2DropMonitor as a service.
+
