@@ -19,12 +19,14 @@ Next edit `TF2DropMonitor.ini`.
     poll_minutes=3
     logging=0
     html_dir=output
+    filename=drops.html
 
 * `accounts` is a comma-separated list of your accounts you wish to monitor.
 * `api_key` is your Steam API key. You can get your key [here](http://steamcommunity.com/dev/apikey).
 * `poll_minutes` defines the frequency of checks done in minutes.
 * `logging` defines whether to log your drops or not. `1` to enable logging.
 * `html_dir` is the directory to which the html output will be generated. This can be a relative or absolute path. Remember that `style.css` and the base `index.html` provided in the output folder has to be in the directory you choose.
+* `file_name` is the name of the HTML to be generated. You will need to rename index.html provided in the output folder to match this.
 
 Once all this is configured, you simply have to run the `TF2DropMonitor.py`
 

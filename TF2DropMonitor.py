@@ -117,6 +117,7 @@ class Options:
         self.pollMinutes = 1
         self.logging = 0
         self.htmldir = ''
+        self.filename = ''
         self.get_config_options()
 
     def get_config_options(self):
@@ -127,6 +128,7 @@ class Options:
             self.pollMinutes = int(self.conf.get('General', 'poll_minutes'))
             self.logging = int(self.conf.get('General', 'logging'))
             self.htmldir = self.conf.get('General', 'html_dir')
+            self.filename = self.conf.get('General', 'file_name')
         except Exception as e:
             print 'Options Error:', e
             return
@@ -151,7 +153,7 @@ class Log:
     def log_html(self, item):
         row = self.construct_row(item)
         row = '%s\n<!--APPENDROWHERE-->' % row
-        htmlfilepath = os.path.join(options.htmldir, 'index.html')
+        htmlfilepath = os.path.join(options.htmldir, options.filename)
         try:
             with open(htmlfilepath, 'r') as f:
                 content = f.read()
